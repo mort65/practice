@@ -1,5 +1,7 @@
-from itertools import permutations
 "a permutable prime is a prime number of two or more digits that remain prime with every possible rearrangement of the digits"
+
+from itertools import permutations
+
 def is_prime(x):
 	if x > 1:
 		for i in range(2,int(x / 2) + 1):
