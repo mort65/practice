@@ -186,9 +186,6 @@ def decrypt(code, key):
 			message += c
 	return(message)
 
-print(encrypt("He who has a why to live can bear almost any how. Friedrich Nietzsche", max_rotations = 3))
-print(decrypt("hoeHh  w wsayh a ove til bc aeanmo rtsalynow ah rFdr. eiNiciteh ezh  sc ", "0:R,1:R,2:L,3:R:U:D,4:D:U:R,5:U:D:L,6:U:D:L,7:R,8:U:R:L"))
-
 message = input()
 encrypted = encrypt(message)
 decrypted = decrypt(encrypted[0], encrypted[1])
