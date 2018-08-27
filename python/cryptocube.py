@@ -1,5 +1,6 @@
 """
 The Crypto-Cube
+
 Imagine a cube, which can contain characters at its vertices. Each vertex can contain a single character. 
 For example, we can store the string "SoloLearn" in a cube.
 'S' will be stored at the position (0, 0, 0) , 'o' at  (0, 1, 0) , 'l' at (1, 1, 0) , 'o' at (1, 0, 0), 'L' at (0, 0, 1), 'e' at (0, 1, 1), 'a' at (1, 1, 1), 'r' at (1, 0, 1). 
@@ -13,8 +14,8 @@ TASK:
 Write a program that encrypts a given string by randomly rotating the corresponding cubes, as well as decrypts the string, given the encrypted string and the rotation sequence.
 For instance, for the text "I love coding and SoloLearn" you will need 4 cubes and here's a random sample of rotations:
 0:U:U:L:R,1:U,2:D:R,3:U:R
-0, 1, 2 or 3 are the numbers of the cubes, U, L R D are the rotation directions (Up, Left, Right, Down). Cube rotations are comma-separated. Each cube can have multiple rotations, separated by colons.
-So, 0:U:U:L:R means that the first cube is rotated up, then again up, to the left, and finally to the right.
+0, 1, 2 or 3 are the numbers of the cubes, U, L R D are the rotation directions (Up, Left, Right, Down). Cube rotations are comma-separated. Each cube can have multiple rotations, 
+separated by colons. So, 0:U:U:L:R means that the first cube is rotated up, then again up, to the left, and finally to the right.
 """
 import random
 
@@ -143,7 +144,6 @@ def encrypt(message, key = '', max_rotations = 4):
 				msg += c.replace(' ', '')
 			key += str(i) + ':'
 			if isencryptable(msg):
-				history = []
 				rotations_count = random.randint(1, max_rotations)
 				j = 0
 				while j < rotations_count:
@@ -151,7 +151,6 @@ def encrypt(message, key = '', max_rotations = 4):
 					directions = get_valid_directions(cubes[i],msg)
 					if len(directions) > 0:
 						rotation = directions[random.randint(0,len(directions) - 1)]
-						history.append(rotation)
 						cubes[i].rotate(rotation)
 						key += str(rotation) + ':'
 				key = key[:-1]
