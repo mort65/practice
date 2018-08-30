@@ -84,9 +84,10 @@ def find_longest_sequences(nums):
 #print(find_longest_sequences([12, 3, 5, 4, 8]))
 #print(find_longest_sequences([1,2,3,4,3,3,3,3,2,1,0,0,0,0]))
 
+
 try:
-	print("\n",find_longest_sequences([int(n) for n in input("\nPlease put space or comma between numbers:\n").replace(',',' ').split()]))
+	print("\n",find_longest_sequences([int(n) for n in input("Please put space or comma between numbers:\n").replace(',',' ').split()]))
 except Exception as e:
 	print(e)
 
-input("\nPress any key to exit...")
+input("\nPress enter to exit...")

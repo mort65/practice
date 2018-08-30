@@ -71,4 +71,4 @@ try:
 except Exception as err:
 	print(err)
 	
-input("\nPress any key to exit...")
+input("\nPress enter to exit...")

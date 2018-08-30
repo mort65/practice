@@ -75,22 +75,22 @@ try:
 			num = int(input_number)
 			if ( num % 2 ) != 0:
 				raise ValueError(input_err)
-				input("\nPress any key to exit...")
+				input("\nPress enter to exit...")
 				exit(1)
 		except ValueError:
 			print(input_err)
-			input("\nPress any key to exit...")
+			input("\nPress enter to exit...")
 			exit(1)
 		get_primes(num-1)
 		for result in goldbach_conjecture(num):
 			print(str(result[0]) + " + " + str(result[1]))
 	else:
 		print(input_err)
-		input("\nPress any key to exit...")
+		input("\nPress enter to exit...")
 		exit(1)
 except Exception as err:
 	print(err)
 					
-input("\nPress any key to exit...")
+input("\nPress enter to exit...")
 
 

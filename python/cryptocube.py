@@ -34,15 +34,23 @@ class CryptoCube(object):
 	def read(self):
 		return [self._a, self._b, self._c, self._d, self._e, self._f, self._g, self._h]
 		
-	def write(self,a,b,c,d,e,f,g,h):
-		self._a = a
-		self._b = b
-		self._c = c
-		self._d = d
-		self._e = e
-		self._f = f
-		self._g = g
-		self._h = h
+	def write(self, a = '', b = '', c = '', d = '', e = '', f = '', g = '', h = '' ):
+		if a != '':
+			self._a = a
+		if b != '':
+			self._b = b
+		if c != '':
+			self._c = c
+		if d != '':
+			self._d = d
+		if e != '':
+			self._e = e
+		if f != '':
+			self._f = f
+		if g != '':
+			self._g = g
+		if h != '':
+			self._h = h
 	
 	def rotate(self, direction):
 		self._vertices = [self._a, self._b, self._c, self._d, self._e, self._f, self._g, self._h]
@@ -185,10 +193,13 @@ def decrypt(code, key):
 			message += c
 	return(message)
 
+print(encrypt("He who has a why to live can bear almost any how. Friedrich Nietzsche", max_rotations = 3))
+print(decrypt("hoeHh  w wsayh a ove til bc aeanmo rtsalynow ah rFdr. eiNiciteh ezh  sc ", "0:R,1:R,2:L,3:R:U:D,4:D:U:R,5:U:D:L,6:U:D:L,7:R,8:U:R:L"))
+
 message = input()
 encrypted = encrypt(message)
 decrypted = decrypt(encrypted[0], encrypted[1])
 print("\nEncrypt: ", encrypted)
 print("\nDecrypt: ", decrypted)
 
-input("\nPress any key to exit...")
+input("\nPress enter to exit...")

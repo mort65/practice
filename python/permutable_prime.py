@@ -41,8 +41,8 @@ def is_permutable_Prime(x):
 try:
 	for i in range(int(input())):
 		if is_permutable_Prime(i):
-			print(i)
+			print('\n',i)
 except Exception as e:
 	print(e)
 	
-input("\nPress any key to exit...")
+input("\nPress enter to exit...")

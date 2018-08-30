@@ -22,8 +22,8 @@ def is_voodoo(x):
 try:
   for i in range(int(input())):
     if is_voodoo(i):
-      print(str(i) + " : " + str(1/i))
+      print('\n' + str(i) + " : " + str(1/i))
 except Exception as e:
   print(e)
 
-input("\nPress any key to exit...")
+input("\nPress enter to exit...")
