@@ -148,7 +148,7 @@ window.onload = function() {
         else {
             var p1 = document.createElement("p");
             var node = document.createTextNode(
-            "Please write 4 integers that are separeted by comma or space."
+            "Please write 4 numbers that are separeted by comma or space."
             );
             p1.appendChild(node);
             p1.style.color = "#ea1c72";
