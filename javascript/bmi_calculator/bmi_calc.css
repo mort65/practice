@@ -1,0 +1,122 @@
+body {
+	width: 800px;
+	margin: auto;
+}
+
+.unitLabel {
+	padding: 2px;
+	font-family: Georgia, "Times New Roman",Times, serif;
+	font-size:14px;
+}
+
+.unitRadio {
+	padding-left: 2px;
+	padding-bottom: 2px;
+}
+
+#unit {
+	border: 1px dotted #333333;
+	font-family: Georgia, "Times New Roman",Times, serif;
+	font-size:14px;
+}
+
+#calcButton {
+	padding: 2px;
+	text-align:center;
+	width: 100px;
+}
+
+#height {
+	padding: 2px;
+	width: 198px;
+}
+#weight {
+	padding: 2px;
+	width: 198px;
+}
+
+#calculator
+{
+    height: 100%;
+    width: 100%;
+}
+
+#inputs {
+	height: 270px;
+    width: 206px; 
+	position:relative;
+	border: 1px solid #333333;
+	background-color: #dddddd;
+	padding :2px;
+	margin: 20px auto;
+}
+#result {
+	position: relative;
+	display: block;
+    height: 270px;
+    width: 820px;
+	background-color:white;
+	padding :2px;
+	margin: 20px auto;
+	vertical-align:middle;
+	text-align:center;
+}
+#result p {
+	text-align:center;
+}
+#result #numbers {
+	text-align:left;
+	width:800px;
+	margin-top :-18px;
+	font-weight:bold;
+	font-family: Arial,Helvetica,Sans-serif,Sans;
+	font-size:14px;
+}
+
+#result #numbers #firstNumber{
+	margin-left:103px;
+}
+
+#result #numbers #secondNumber{
+	margin-left:8px;
+}
+#result #numbers #thirdNumber{
+	margin-left:36px;
+}
+#result #numbers #forthNumber{
+	margin-left:137px;
+}
+#result #numbers #fifthNumber{
+	margin-left:105px;
+}
+#result #numbers #sixthNumber{
+	margin-left:100px;
+}
+#result #numbers #seventhNumber{
+	margin-left:103px;
+}
+#inputs h2 {
+	text-align:center;
+}
+#calc {
+	text-align:center;
+}
+
+#graph {
+	width:600px;
+	height:100px;
+	color: #fff;
+	padding-left:3px;
+	padding-right:3px;
+}
+#line {
+	stroke:#000000; 
+	stroke-linecap:round; 
+	stroke-width:5;
+}
+
+#bmi {
+	font-size:24px;
+	font-family: Arial,Helvetica,Sans-serif,Sans;
+	text-align:center;
+}
