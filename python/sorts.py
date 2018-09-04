@@ -200,6 +200,7 @@ radixSort, countingSort, sorted ]
 
 results = testSorts(fl,al,5000)
 sortedResults = sorted(results, key=lambda el: (el[1]))
+print("Ranking:\n")
 for r in sortedResults:
     print(r)
     

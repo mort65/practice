@@ -1,7 +1,26 @@
-body {
-	width: 800px;
-	margin: auto;
+* {
+padding :0px;
+margin :0px;
 }
+
+body {
+	width: 500px;
+	margin: auto;
+    word-wrap: break-word;
+    white-space:pre-word;
+}
+
+sup {
+	font-size: 70%;
+}
+
+#weightP {
+    margin-top:10px;
+    }
+
+#heightP {
+    margin-top:10px;
+    }
 
 .unitLabel {
 	padding: 2px;
@@ -11,6 +30,8 @@ body {
 
 .unitRadio {
 	padding-left: 2px;
+    margin-right: 4px;
+    margin-left: 4px;
 	padding-bottom: 2px;
 }
 
@@ -18,21 +39,27 @@ body {
 	border: 1px dotted #333333;
 	font-family: Georgia, "Times New Roman",Times, serif;
 	font-size:14px;
+    margin-top:22px;
+    padding:4px;
 }
 
 #calcButton {
 	padding: 2px;
 	text-align:center;
-	width: 100px;
+	width:100px;
+	height:28px;
+    margin-top:20px;
 }
 
 #height {
 	padding: 2px;
 	width: 198px;
+    height:15px;
 }
 #weight {
 	padding: 2px;
 	width: 198px;
+    height:15px;
 }
 
 #calculator
@@ -42,68 +69,76 @@ body {
 }
 
 #inputs {
-	height: 270px;
-    width: 206px; 
+	height: 265px;
+	display: block;
+    width: 208px; 
 	position:relative;
 	border: 1px solid #333333;
 	background-color: #dddddd;
-	padding :2px;
+	padding :4px;
 	margin: 20px auto;
 }
 #result {
+    height: 265px;
+    width: 420px;
+	background-color:white;
+	padding :4px;
+	margin: 20px auto;
+	text-align:center;
 	position: relative;
 	display: block;
-    height: 270px;
-    width: 820px;
-	background-color:white;
-	padding :2px;
-	margin: 20px auto;
-	vertical-align:middle;
-	text-align:center;
 }
 #result p {
 	text-align:center;
+	line-height:1.35;
 }
+
+#inputs p {
+	line-height:1.35;
+}
+
 #result #numbers {
 	text-align:left;
-	width:800px;
-	margin-top :-18px;
+	width:424px;
+	margin-top :-40px;
 	font-weight:bold;
 	font-family: Arial,Helvetica,Sans-serif,Sans;
 	font-size:14px;
 }
 
 #result #numbers #firstNumber{
-	margin-left:103px;
+	margin-left:2px;
 }
 
 #result #numbers #secondNumber{
-	margin-left:8px;
+	margin-left:4px;
 }
 #result #numbers #thirdNumber{
-	margin-left:36px;
+	margin-left:14px;
 }
 #result #numbers #forthNumber{
-	margin-left:137px;
+	margin-left:84px;
 }
 #result #numbers #fifthNumber{
-	margin-left:105px;
+	margin-left:66px;
 }
 #result #numbers #sixthNumber{
-	margin-left:100px;
+	margin-left:59px;
 }
 #result #numbers #seventhNumber{
-	margin-left:103px;
+	margin-left:60px;
 }
 #inputs h2 {
 	text-align:center;
+	line-height: 1;
+    margin-top:12px;
 }
 #calc {
 	text-align:center;
 }
 
 #graph {
-	width:600px;
+	width:400px;
 	height:100px;
 	color: #fff;
 	padding-left:3px;
@@ -112,11 +147,26 @@ body {
 #line {
 	stroke:#000000; 
 	stroke-linecap:round; 
-	stroke-width:5;
+	stroke-width:4;
+	display:none;
 }
-
-#bmi {
+#bmiDiv {
 	font-size:24px;
 	font-family: Arial,Helvetica,Sans-serif,Sans;
 	text-align:center;
+    margin-top:20px;
+}
+
+#bmiP1 {
+	display:none;
+}
+
+#bmiP2 {
+	display:none;
+    margin-top:14px;
+}
+
+#bmiLabel {
+	font-family: Georgia, "Times New Roman",Times, serif;
+	font-size:20px;
 }

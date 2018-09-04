@@ -19,10 +19,6 @@ function setUnits(units) {
     }
 }
 
-function isNumber(val) {
-    return (val >= 0 || val < 0);
-}
-
 function calcBMI(h,w) {
     if (isImperial)
     {
@@ -34,7 +30,7 @@ function calcBMI(h,w) {
         var weight = Number(w); 
     }
     result = (weight / (height * height)).toFixed(2);
-    if (isNumber(result)) {
+    if (isFinite(result)) {
         if (result > 35)
         {
             resultColor = "rgb(216,0,0)";
@@ -86,44 +82,48 @@ window.onload = function() {
     }
     var calcButton = document.getElementById("calcButton");
     calcButton.onclick = function() {
-    var bmiDiv = document.getElementById("bmi");
+	var bmiP1 = document.getElementById("bmiP1");
+    var bmiP2 = document.getElementById("bmiP2");
     var heightInput = document.getElementById("height");
     var weightInput = document.getElementById("weight");
-    var p1 = document.createElement("p");
-    var p2 = document.createElement("p");
+	var bmiValue = document.getElementById("bmiValue");
     BMI = calcBMI(heightInput.value,weightInput.value);
-    var node1 = document.createTextNode(BMI);
-    var node2 = document.createTextNode(resultText);
     var line = document.getElementById("line");
-    if (isNumber(BMI)) {
+    if (isFinite(BMI)) {
         line.style.display = "block";
         translateLine = 0;
         if (BMI > 40 ) {
-            translateLine = 600;
+            translateLine = 398;
             }
         else if (BMI < 15) {
-                translateLine = 3;
+                translateLine = 2;
             }
         else {
-            translateLine = ((BMI - 15) * 24);
-            if (translateLine < 3) {
-                translateLine = 3;
+            translateLine = ((BMI - 15) * 16);
+            if (translateLine < 2) {
+                translateLine = 2;
             }
+			else if (translateLine > 598) {
+				translateLine = 398;
+			}
         }
         line.style.transform = "translate(" + translateLine + "px)";
         line.style.webkitTransform = "translate(" + translateLine + "px)";
     }
     else {
-        line.style.display = "none";
-    }
-    p1.style.marginTop="50px";
-    p1.style.fontWeight="bold";
-    p2.style.fontWeight="bold";
-    p2.style.color = resultColor;
-    p1.appendChild(node1);
-    p2.appendChild(node2);
-    bmiDiv.innerHTML = "";
-    bmiDiv.appendChild(p1);
-    bmiDiv.appendChild(p2);
+		line.style.display = "none";
+	}
+	bmiValue.style.fontWeight = "bold";
+	bmiValue.innerHTML = BMI;
+	bmiP1.style.display = "block";
+	if (isFinite(BMI)) {
+		bmiP2.style.fontWeight="bold";
+		bmiP2.style.color = resultColor;
+		bmiP2.innerHTML = resultText;
+		bmiP2.style.display = "block";
+	}
+	else {
+		bmiP2.style.display = "none";		
+	}
     }
 }

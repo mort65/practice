@@ -55,7 +55,7 @@ function isNumber(val) {
 }
 
 window.onload = function() {
-    var input = prompt("Please enter 2 complex numbers like a b c d");
+    var input = prompt("Please enter the imaginary and real parts of two complex numbers like a b c d");
     if (input != null) {
         var values = new Array();
         var digits = new Array("1", "2", "3", "4","5", "6", "7", "8", "9", "0", ".", "-");
