@@ -20,20 +20,19 @@ from itertools import combinations
 from re import match
 
 def guitar(g,s):
-	l = sorted([ c for c in s if c <= g ],reverse=True)
-	f = 0
-	if sum(l) < g or g < l[-1]:
+	if g in s:
+		return [g]
+	elif g < 2:
 		return None
-	elif sum(l) == g:
-		return l
-	for i in range(1, len(l) + 1):
-		if i == len(l):
-			f = 1
+	l = sorted([ c for c in s if c > 0 and c < g ],reverse=True)
+	if sum(l) == g:
+		return(l)
+	elif len(l) == 0 or g < l[-1] or sum(l) < g:
+		return None
+	for i in range(2, len(l)):
 		for n in combinations(l,i):
 			if sum(n) == g:
 				return list(n)
-			if f == 1:
-				return None
 	return None
 
 def process_input():
@@ -81,11 +80,3 @@ def process_input():
 process_input()
 
 input("\nPress enter to exit...")
-
-		
-		
-			
-			
-			
-		
-	
