@@ -40,8 +40,8 @@ def process_input():
 	err2 = "Invalid input: Please write a list of positive integers that are separated by space or comma like: \'1 2 3\'."
 	try:
 		inp = input("Please write the target number or both the target and the list like '4 [1 2 3]':\n").replace(',',' ')
-		m1 = match(r'^\s*?(\d+)\s*?([\{\(\[])([\s*?\d+\s*?]+)([\}\)\]])\s*?$',inp)
-		if m1 and ((m1.group(2) == m1.group(4) != None) or ((m1.group(2) + m1.group(4)) in ('{}','()','[]'))):
+		m1 = match(r'^\s*?(\d+)\s*?([\{\(\[\<])([\s*?\d+\s*?]+)([\}\)\]\>])\s*?$',inp)
+		if m1 and (m1.group(2) + m1.group(4)) in ('{}','()','[]','<>'):
 			try:
 				target = int(m1.group(1))
 				subset = [int(num) for num in m1.group(3).split()]
@@ -50,10 +50,9 @@ def process_input():
 				return
 		else:
 			try:
-				m1 = match(r'^\s*?([\{\(\[])?(\s*?\d+\s*?)([\}\)\]])?\s*?$',inp)
+				m1 = match(r'^\s*?([\{\(\[\<])?(\s*?\d+\s*?)([\}\)\]\>])?\s*?$',inp)
 				if m1 and ((m1.group(1) == m1.group(3) == None) or \
-				( not(m1.group(1)) and not(m1.group(3)) and \
-				(m1.group(1) + m1.group(3)) in ('{}','()','[]'))):
+				(m1.group(1) + m1.group(3)) in ('{}','()','[]','<>')):
 					target = int(m1.group(2))
 				else: raise ValueError
 			except ValueError:
@@ -61,8 +60,8 @@ def process_input():
 				return
 			try:
 				inp = input("Please write a list of positive integers:\n").replace(',',' ')
-				m2 = match(r'^\s*?([\{\(\[])?([\s*?\d+\s*]+)([\}\)\]])*\s*?$',inp)
-				if m2 and ((m2.group(1) == m2.group(3) == None) or (m2.group(1) + m2.group(3)) in ('{}','()','[]')):
+				m2 = match(r'^\s*?([\{\(\[\<])?([\s*?\d+\s*]+)([\}\)\]\>])*\s*?$',inp)
+				if m2 and ((m2.group(1) == m2.group(3) == None) or (m2.group(1) + m2.group(3)) in ('{}','()','[]','<>')):
 					subset = [int(num) for num in m2.group(2).split()]
 				else: raise ValueError
 			except ValueError:
@@ -75,7 +74,6 @@ def process_input():
 			print("\n(G={0}, S={1}, there is no guitar subset that adds up to {2}.".format(target,subset,target))
 	except Exception as e:
 		print(e)
-		return
 		
 process_input()
 

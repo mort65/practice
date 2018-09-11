@@ -189,7 +189,6 @@ def testSorts(fl,al,k):
     return rl
 
 a = []
-
 for i in range (1000):
     a.append(randint(0,4999))
 
