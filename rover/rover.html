@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Rover</title>
+        <style>
+            body {
+                text-align: center;
+                background-color:#111;
+                font-family: sans-serif;
+            }
+            #canvas {
+                background-color: burlywood;
+            }
+            #cmd_text {
+                text-transform: uppercase;
+                padding: 6px;
+                margin: 5px;
+                
+            }
+            #cmd_button {
+                margin: 8px; 
+               padding: 6px;     
+            }
+            #info_textarea {          
+                padding: 5px;
+                margin: 5px;
+                text-align: center;
+                font-size: 10pt;
+                }
+            h2 {
+                color:peru;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Mars Rover</h2>
+        <canvas id="canvas" width="300" height="300"></canvas><br />
+        <input type="text" id="cmd_text" autofocus="autofocus" />
+        <input type="button" id="cmd_button" value="Execute" name="Execute"/><br />
+        <textarea id='info_textarea' cols="38" rows="3" readonly="readonly" wrap=></textarea>
+        <script src="rover.js"></script>
+    </body>
+</html>
