@@ -130,7 +130,10 @@ class Sudoku {
                 } while (changes);
 
             } catch (ex) {
-                throw ex;
+                if (ex === 'Invalid Move')
+                    return false;
+                else
+                    throw ex;
             }
             let tActual = transposeArray(this.actual, this.actual.length);
             for (let i = 0; i < this.values.length; i++) {
@@ -149,7 +152,7 @@ class Sudoku {
                     if (err === "Max Iterations") {
                         return false;
 
-                    } else throw (err);
+                    } else throw err;
                 }
                 if (isPuzzleSolved(0)) {
                     this.values = this._values;
@@ -206,7 +209,6 @@ class Sudoku {
 
         //if possible value is empty then throw invalid move
         if (str === '') {
-            console.log(this.actual, col, row);
             throw 'Invalid Move';
         }
         return str;
@@ -222,7 +224,6 @@ class Sudoku {
                     try {
                         this.possible[col][row] = this.calculatePossibleValues(col, row);
                     } catch (ex) {
-                        console.log(ex);
                         throw 'Invalid Move';
                     }
                     if (this.possible[col][row].length === 1) {
