@@ -466,7 +466,7 @@ select = index => {
     selectedIndex = index;
 }
 
-function transposeArray(array, arrayLength) {
+transposeArray = (array, arrayLength) => {
     var newArray = [];
     for (let i = 0; i < array.length; i++) {
         newArray.push([]);
