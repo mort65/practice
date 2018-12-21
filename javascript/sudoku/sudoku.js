@@ -10,92 +10,75 @@ let redoes = []
 class Sudoku {
     constructor(values) {
         this.values = values;
-        this._values;
+        this._values = [];
         this.possible = [
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', '', '']
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
         ];
         this.actual = [
-            [this.values[0], this.values[9], this.values[18],
-                this.values[27], this.values[36], this.values[45],
-                this.values[54], this.values[63], this.values[72]
-            ],
-
-            [this.values[1], this.values[10], this.values[19],
-                this.values[28], this.values[37], this.values[46],
-                this.values[55], this.values[64], this.values[73]
-            ],
-
-            [this.values[2], this.values[11], this.values[20],
-                this.values[29], this.values[38], this.values[47],
-                this.values[56], this.values[65], this.values[74]
-            ],
-
-            [this.values[3], this.values[12], this.values[21],
-                this.values[30], this.values[39], this.values[48],
-                this.values[57], this.values[66], this.values[75]
-            ],
-
-            [this.values[4], this.values[13], this.values[22],
-                this.values[31], this.values[40], this.values[49],
-                this.values[58], this.values[67], this.values[76]
-            ],
-
-            [this.values[5], this.values[14], this.values[23],
-                this.values[32], this.values[41], this.values[50],
-                this.values[59], this.values[68], this.values[77]
-            ],
-
-            [this.values[6], this.values[15], this.values[24],
-                this.values[33], this.values[42], this.values[51],
-                this.values[60], this.values[69], this.values[78]
-            ],
-
-            [this.values[7], this.values[16], this.values[25],
-                this.values[34], this.values[43], this.values[52],
-                this.values[61], this.values[70], this.values[79]
-            ],
-
-            [this.values[8], this.values[17], this.values[26],
-                this.values[35], this.values[44], this.values[53],
-                this.values[62], this.values[71], this.values[80]
-            ]
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
         ];
+
         this.solve = () => {
-            for (let i = 0; i < this.values.length; i++) {
-                for (let j = 0; j < this.values.length; j++) {
-                    if (this.sameCol(i, j) || this.sameRow(i, j) || this.sameCol(i, j)) {
-                        if (this.values[i] && i !== j && this.values[i] === this.values[j]) {
-                            if (defaultValues.length) {
-                                if (defaultValues[i] !== this.values[i]) {
-                                    this.values[i] = 0;
-                                } else if (defaultValues[j] !== this.values[j]) {
-                                    this.values[j] = 0;
+            //Atleast 17 clues are needed to solve a sudoku
+            if (this.values.filter(x => x === 0).length < 65) {
+                for (let i = 0; i < this.values.length; i++) {
+                    for (let j = 0; j < this.values.length; j++) {
+                        if (this.sameCol(i, j) || this.sameRow(i, j) || this.sameCol(i, j)) {
+                            if (this.values[i] && i !== j && this.values[i] === this.values[j]) {
+                                if (defaultValues.length > 0) {
+                                    if (defaultValues[i] !== this.values[i]) {
+                                        console.log('Invalid Move');
+                                        this.values[i] = 0;
+                                    } else if (defaultValues[j] !== this.values[j]) {
+                                        this.values[j] = 0;
+                                        console.log('Invalid Move');
+                                    } else {
+                                        return false;
+                                    }
                                 } else {
-                                    return false;
+                                    this.values[i] = 0;
                                 }
-                            } else {
-                                this.values[i] = 0;
                             }
                         }
                     }
                 }
-            }
-            let changes = false;
-            let exitLoop = false;
-            try {
-                do {
+                let changes = false;
+                let exitLoop = false;
+                this.array2Matrix(this.values, this.actual);
+                for (let i = 0; i < this.possible.length; i++) {
+                    this.possible[i] = ['', '', '', '', '', '', '', '', ''];
+                }
+                try {
                     do {
                         do {
                             do {
-                                changes = this.checkColumnAndRows();
+                                do {
+                                    changes = this.checkColumnAndRows();
+                                    if (this.isPuzzleSolved()) {
+                                        exitLoop = true;
+                                        break;
+                                    }
+                                } while (changes);
+
+                                if (exitLoop) break;
+
+                                changes = this.lookForLoneRangersinBlocks();
                                 if (this.isPuzzleSolved()) {
                                     exitLoop = true;
                                     break;
@@ -104,7 +87,7 @@ class Sudoku {
 
                             if (exitLoop) break;
 
-                            changes = this.lookForLoneRangersinBlocks();
+                            changes = this.lookForLoneRangersinRows();
                             if (this.isPuzzleSolved()) {
                                 exitLoop = true;
                                 break;
@@ -113,49 +96,40 @@ class Sudoku {
 
                         if (exitLoop) break;
 
-                        changes = this.lookForLoneRangersinRows();
+                        changes = this.lookForLoneRangersinColumns();
                         if (this.isPuzzleSolved()) {
                             exitLoop = true;
                             break;
                         }
                     } while (changes);
 
-                    if (exitLoop) break;
+                } catch (ex) {
+                    if (ex === 'Invalid Move') {
+                        console.log('Invalid Move')
+                        return false;
+                    } else
+                        throw ex;
+                }
 
-                    changes = this.lookForLoneRangersinColumns();
-                    if (this.isPuzzleSolved()) {
-                        exitLoop = true;
-                        break;
-                    }
-                } while (changes);
+                this.matrix2Array(this.actual, this.values);
 
-            } catch (ex) {
-                if (ex === 'Invalid Move')
-                    return false;
-                else
-                    throw ex;
-            }
-            let tActual = transposeArray(this.actual, this.actual.length);
-            for (let i = 0; i < this.values.length; i++) {
-                this.values[i] = tActual[parseInt(i % 9)][parseInt(i / 9)];
-            }
+                if (this.isPuzzleSolved()) {
+                    return true;
+                }
 
-            if (this.isPuzzleSolved()) {
-                return true;
-            }
+                this.cloneArray(this.values, this._values);
 
-            this._values = this.values;
-            if (this._values.filter(x => x === 0).length < 65) {
                 try {
                     this.solveSudokuRecursivly(this._values);
                 } catch (err) {
                     if (err === "Max Iterations") {
+                        console.log('Max Iterations')
                         return false;
 
                     } else throw err;
                 }
-                if (isPuzzleSolved(0)) {
-                    this.values = this._values;
+                this.cloneArray(this._values, this.values);
+                if (this.isPuzzleSolved(0)) {
                     return true;
                 }
                 return false;
@@ -164,6 +138,25 @@ class Sudoku {
             }
         };
     }
+
+    matrix2Array(matrix, arr) {
+        for (let i = 0; i < arr.length; i++) {
+            arr[i] = matrix[parseInt(i % 9)][parseInt(i / 9)];
+        }
+    }
+
+    array2Matrix(arr, matrix) {
+        for (let i = 0; i < matrix.length; i++) {
+            let r = 0;
+            for (let j = 0; j < arr.length; j++) {
+                if ((j % 9) === i) {
+                    matrix[i][r] = arr[j];
+                    r++;
+                }
+            }
+        }
+    }
+
     sameRow(i, j) {
         return parseInt(i / 9) === parseInt(j / 9);
     }
@@ -228,7 +221,6 @@ class Sudoku {
                     }
                     if (this.possible[col][row].length === 1) {
                         //the number is confirmed
-                        //console.log(col, row, Number(possible[col][row]));
                         this.actual[col][row] = parseInt(this.possible[col][row]);
                         changes = true;
                     }
@@ -252,11 +244,11 @@ class Sudoku {
                 for (let c = 0; c < 9; c += 3) {
                     nextBlock = false;
 
-                    //check within  the minigrid
+                    //check within  the block
                     occurrence = 0;
                     for (let rr = 0; rr < 3; rr++) {
                         for (let cc = 0; cc < 3; cc++) {
-                            if (this.actual[c + cc][r + rr] === 0 && this.possible[c + cc][r + rr].length && this.possible[c + cc][r + rr].indexOf(n.toString()) > -1) {
+                            if (this.actual[c + cc][r + rr] === 0 && this.possible[c + cc][r + rr].length > 0 && this.possible[c + cc][r + rr].indexOf(n.toString()) > -1) {
                                 occurrence++;
                                 cPos = c + cc;
                                 rPos = r + rr;
@@ -270,7 +262,6 @@ class Sudoku {
                     }
                     if (!nextBlock && occurrence === 1) {
                         //the number confirmed
-                        //console.log(cPos, rPos, n);
                         this.actual[cPos][rPos] = n;
                         changes = true;
                     }
@@ -292,7 +283,7 @@ class Sudoku {
             for (let n = 1; n < 10; n++) {
                 occurrence = 0;
                 for (let c = 0; c < 9; c++) {
-                    if (this.actual[c][r] === 0 && this.possible[c][r].length && this.possible[c][r].indexOf(n.toString()) > -1) {
+                    if (this.actual[c][r] === 0 && this.possible[c][r].length > 0 && this.possible[c][r].indexOf(n.toString()) > -1) {
                         occurrence++;
 
                         //if multiple occurrences, not a  lone ranger anymore
@@ -322,7 +313,7 @@ class Sudoku {
             for (let n = 1; n < 10; n++) {
                 occurrence = 0;
                 for (let r = 0; r < 9; r++) {
-                    if (this.actual[c][r] === 0 && this.possible[c][r].length && this.possible[c][r].indexOf(n.toString()) > -1) {
+                    if (this.actual[c][r] === 0 && this.possible[c][r].length > 0 && this.possible[c][r].indexOf(n.toString()) > -1) {
                         occurrence++;
 
                         //if multiple occurrences, not a  lone ranger anymore
@@ -342,6 +333,12 @@ class Sudoku {
         return changes;
     }
 
+    cloneArray(srcArr, dstArr) {
+        for (let i = 0; i < srcArr.length; i++) {
+            dstArr[i] = srcArr[i]
+        }
+    }
+
     isPuzzleSolved(m = 1) {
         if (m) {
             for (let c = 0; c < 9; c++) {
@@ -355,7 +352,7 @@ class Sudoku {
                     if (!isSolved) {
                         break;
                     }
-                    if (this._values[j]) {
+                    if (this._values[j] > 0) {
                         for (let k = 0; k < this._values.length; k++) {
                             if (j !== k) {
                                 if (this.sameRow(j, k) || this.sameCol(j, k) || this.sameBlock(j, k)) {
@@ -397,7 +394,7 @@ class Sudoku {
         let excludedNumbers = [];
         for (let j = 0; j < this.values.length; j++) {
             if (this.sameRow(i, j) || this.sameCol(i, j) || this.sameBlock(i, j)) {
-                if (excludedNumbers.indexOf(v[j] === -1)) {
+                if (excludedNumbers.indexOf(v[j]) === -1) {
                     excludedNumbers.push(v[j]);
                 }
             }
@@ -415,24 +412,31 @@ solve = () => {
     let start = performance.now();
     let solved = false
     solved = sudoku.solve();
-    if (!solved && defaultValues.length) {
-        let s = new Sudoku(defaultValues);
+    if (!solved && defaultValues.length > 0) {
+        let values = [];
+        for (let i of defaultValues) {
+            values.push(i);
+        }
+        let s = new Sudoku(values);
         solved = s.solve();
         if (solved) {
             sudoku.values = s.values;
         }
     }
     let end = performance.now();
-    if (solved) {
-        for (let i = 0; i < cells.length; i++) {
+    for (let i = 0; i < cells.length; i++) {
+        if (sudoku.values[i]) {
             cells[i].innerText = sudoku.values[i];
-            cells[i].style.backgroundColor = "white";
+        } else {
+            cells[i].innerText = '';
         }
-        undoes = [];
-        redoes = [];
-        selectedIndex = null;
-        caption.innerText = `Solved in ${end - start} ms.`;
+        cells[i].style.backgroundColor = "white";
     }
+    undoes = [];
+    redoes = [];
+    selectedIndex = null;
+    if (solved)
+        caption.innerText = `Solved in ${end - start} ms.`;
 }
 
 select = index => {
@@ -464,21 +468,6 @@ select = index => {
         cells[selectedIndex].style.backgroundColor = "white";
     }
     selectedIndex = index;
-}
-
-transposeArray = (array, arrayLength) => {
-    var newArray = [];
-    for (let i = 0; i < array.length; i++) {
-        newArray.push([]);
-    }
-
-    for (let i = 0; i < array.length; i++) {
-        for (let j = 0; j < arrayLength; j++) {
-            newArray[j].push(array[i][j]);
-        }
-    }
-
-    return newArray;
 }
 
 normalize = n => {
@@ -704,6 +693,8 @@ readFile = e => {
         let isBold = true;
         for (let i = 0; i < content.length; i++) {
             if ('1234567890.*'.indexOf(content[i] > -1)) {
+                if (values.length === cells.length)
+                    break;
                 switch (content[i]) {
                     case '0':
                     case '.':
@@ -728,37 +719,45 @@ readFile = e => {
                         break;
                     case '*':
                         isBold = false;
+                        break;
+                    default:
+                        alert("The file format is incorrect.");
+                        return;
                 }
             } else {
-                values = null;
-                break;
-            }
-            if (values.length > cells.length) {
-                values = null;
-                break;
+                alert("The file format is incorrect.");
+                return;
             }
         }
-        if (values !== null) {
-            for (let i = 0; i < values.length; i++) {
-                sudoku.values[i] = Math.abs(values[i])
-                if (values[i] > 0) {
-                    cells[i].style.fontWeight = "bold";
-                    defaultValues[i] = sudoku.values[i];
-                } else {
-                    cells[i].style.fontWeight = "normal";
-                    defaultValues[i] = 0;
-                }
-                cells[i].style.backgroundColor = "white";
-                if (sudoku.values[i]) {
-                    cells[i].innerText = sudoku.values[i];
-                } else {
-                    cells[i].innerText = '';
-                }
+        for (let i = 0; i < values.length; i++) {
+            if (i === cells.length)
+                break;
+            sudoku.values[i] = Math.abs(values[i])
+            if (values[i] > 0) {
+                cells[i].style.fontWeight = "bold";
+                defaultValues[i] = sudoku.values[i];
+            } else {
+                cells[i].style.fontWeight = "normal";
+                defaultValues[i] = 0;
             }
-            undoes = [];
-            redoes = [];
-            caption.innerText = 'Sudoku';
+            cells[i].style.backgroundColor = "white";
+            if (sudoku.values[i]) {
+                cells[i].innerText = sudoku.values[i];
+            } else {
+                cells[i].innerText = '';
+            }
         }
+        if (values.length < cells.length) {
+            for (let i = values.length; i < cells.length; i++) {
+                cells[i].style.fontWeight = "normal";
+                sudoku.values[i] = 0;
+                defaultValues[i] = 0;
+                cells[i].innerText = '';
+            }
+        }
+        undoes = [];
+        redoes = [];
+        caption.innerText = 'Sudoku';
     };
     reader.readAsText(file, 'utf-8');
 }
