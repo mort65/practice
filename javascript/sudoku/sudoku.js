@@ -58,6 +58,10 @@ class Sudoku {
                         }
                     }
                 }
+                if (this.values.filter(x => x === 0).length > 64) { 
+                    console.log("Insufficient Clues")
+                    return false;
+                }
                 let changes = false;
                 let exitLoop = false;
                 this.array2Matrix(this.values, this.actual);
@@ -134,6 +138,7 @@ class Sudoku {
                 }
                 return false;
             } else {
+                console.log("Insufficient Clues")
                 return false
             }
         };
