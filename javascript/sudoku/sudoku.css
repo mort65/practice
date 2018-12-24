@@ -24,6 +24,7 @@ body {
 #btnReset,
 #btnSolve,
 #btnClear,
+#btnNew,
 #btnUndo,
 #btnRedo {
     margin: 5px;
