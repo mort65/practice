@@ -6,6 +6,20 @@ let values = []
 let sudoku = null;
 let undoes = []
 let redoes = []
+let puzzles = [
+    "39..6.8.7.2..3..5......5.969..5.24.............39.7..281.6......3..5..8.5.2.9..43",
+    "..8.5.49.4657....2.9.43.1656491..53...2.9......36......2...1.5.9...7..2.371..29..",
+    "..5.9...1.....2.7376...82...12..9..4...2.3...3..1..96...19...5897.5.....5...3.7..",
+    ".51..4....32.9......7..1..2....1.4..84..7..31..3.8....7..3..9......4.26....9..18.",
+    "...26.7.168..7..9.19...45..82.1...4...46.29...5...3.28..93...74.4..5..367.3.18...",
+    ".18..93.....4....8...3....95....2...28...56....9.....5..2.61..4.....48..6.3...2..",
+    "....1.7.....3......6.758.1.2......47.81.......396..........9.51....21.3...5...4..",
+    ".54..78...........2...6..514..17.38.......6...82......5....41.23...5.......71...6",
+    "...9...5....3.5..9.5..7..1.795.6..8.....1....6.2...9..9.6...8..43.7.........8...7",
+    "..6.....4...86.73..4.35...217.4..6...9.....8...8..6.172...81.4..67.43...8.....3..",
+    "1...7..3.83.6.......29..6.86....49.7.9.....5.3.75....42.3..91.......2.43.4..8...9",
+    "6......4...5..2..7729.....3.9..4...1....6....4...8..7.3.....1652..4..8...5......4",
+];
 
 class Sudoku {
     constructor(values) {
@@ -37,6 +51,7 @@ class Sudoku {
         this.solve = () => {
             //Atleast 17 clues are needed to solve a sudoku
             if (this.values.filter(x => x === 0).length < 65) {
+                this._values = [...this.values];
                 for (let i = 0; i < this.values.length; i++) {
                     for (let j = 0; j < this.values.length; j++) {
                         if (this.sameCol(i, j) || this.sameRow(i, j) || this.sameCol(i, j)) {
@@ -58,7 +73,7 @@ class Sudoku {
                         }
                     }
                 }
-                if (this.values.filter(x => x === 0).length > 64) { 
+                if (this.values.filter(x => x === 0).length > 64) {
                     console.log("Insufficient Clues")
                     return false;
                 }
@@ -73,7 +88,67 @@ class Sudoku {
                         do {
                             do {
                                 do {
-                                    changes = this.checkColumnAndRows();
+                                    do {
+                                        do {
+                                            do {
+                                                do {
+                                                    do {
+                                                        do {
+                                                            changes = this.checkColumnAndRows();
+                                                            if (this.isPuzzleSolved()) {
+                                                                exitLoop = true;
+                                                                break;
+                                                            }
+                                                        } while (changes);
+
+                                                        if (exitLoop) break;
+
+                                                        changes = this.lookForLoneRangersinBlocks();
+                                                        if (this.isPuzzleSolved()) {
+                                                            exitLoop = true;
+                                                            break;
+                                                        }
+                                                    } while (changes);
+
+                                                    if (exitLoop) break;
+
+                                                    changes = this.lookForLoneRangersinRows();
+                                                    if (this.isPuzzleSolved()) {
+                                                        exitLoop = true;
+                                                        break;
+                                                    }
+                                                } while (changes);
+
+                                                if (exitLoop) break;
+
+                                                changes = this.lookForLoneRangersinColumns();
+                                                if (this.isPuzzleSolved()) {
+                                                    exitLoop = true;
+                                                    break;
+                                                }
+                                            } while (changes);
+
+
+                                            if (exitLoop) break;
+                                            changes = this.lookForTwinsInBlocks();
+                                            if (this.isPuzzleSolved()) {
+                                                exitLoop = true;
+                                                break;
+                                            }
+                                        } while (changes);
+
+                                        if (exitLoop) break;
+
+                                        changes = this.lookForTwinsInRows();
+                                        if (this.isPuzzleSolved()) {
+                                            exitLoop = true;
+                                            break;
+                                        }
+                                    } while (changes);
+
+                                    if (exitLoop) break;
+
+                                    changes = this.lookForTwinsInColumns();
                                     if (this.isPuzzleSolved()) {
                                         exitLoop = true;
                                         break;
@@ -82,7 +157,7 @@ class Sudoku {
 
                                 if (exitLoop) break;
 
-                                changes = this.lookForLoneRangersinBlocks();
+                                changes = this.lookForTripletsInBlocks();
                                 if (this.isPuzzleSolved()) {
                                     exitLoop = true;
                                     break;
@@ -91,7 +166,7 @@ class Sudoku {
 
                             if (exitLoop) break;
 
-                            changes = this.lookForLoneRangersinRows();
+                            changes = this.lookForTripletsInRows();
                             if (this.isPuzzleSolved()) {
                                 exitLoop = true;
                                 break;
@@ -100,7 +175,7 @@ class Sudoku {
 
                         if (exitLoop) break;
 
-                        changes = this.lookForLoneRangersinColumns();
+                        changes = this.lookForTripletsInColumns();
                         if (this.isPuzzleSolved()) {
                             exitLoop = true;
                             break;
@@ -109,8 +184,8 @@ class Sudoku {
 
                 } catch (ex) {
                     if (ex === 'Invalid Move') {
-                        console.log('Invalid Move')
-                        return false;
+                        console.log("Puzzle not solved.")
+                        this.array2Matrix(this._values, this.actual);
                     } else
                         throw ex;
                 }
@@ -118,27 +193,36 @@ class Sudoku {
                 this.matrix2Array(this.actual, this.values);
 
                 if (this.isPuzzleSolved()) {
+                    console.log("Puzzle solved.")
                     return true;
                 }
 
-                this.cloneArray(this.values, this._values);
+                console.log('Solvig by brute force...');
+
+                this._values = [...this.values];
 
                 try {
-                    this.solveSudokuRecursivly(this._values);
+                    this.solveSudokuByBruteForce(this._values);
                 } catch (err) {
                     if (err === "Max Iterations") {
-                        console.log('Max Iterations')
+                        console.log('Max Iterations Error')
+                        console.log("Puzzle not solved.")
                         return false;
 
                     } else throw err;
                 }
-                this.cloneArray(this._values, this.values);
+
+                this.values = [...this._values];
+
                 if (this.isPuzzleSolved(0)) {
+                    console.log("Puzzle solved.")
                     return true;
                 }
+                console.log("Puzzle not solved.")
                 return false;
             } else {
                 console.log("Insufficient Clues")
+                console.log("Can't solve the puzzle.")
                 return false
             }
         };
@@ -160,6 +244,39 @@ class Sudoku {
                 }
             }
         }
+    }
+
+    array2String(arr) {
+        let str = '';
+        for (let i = 0; i < arr.length; i++) {
+            str += arr[i].toString();
+        }
+        return str;
+    }
+
+    string2Array(str, arr) {
+        for (let i = 0; i < str.length; i++) {
+            if (i < arr.length) {
+                arr[i] = str[i];
+            } else {
+                arr.push(str[i]);
+            }
+        }
+    }
+
+    transposeArray(array, arrayLength) {
+        var newArray = [];
+        for (let i = 0; i < array.length; i++) {
+            newArray.push([]);
+        }
+
+        for (let i = 0; i < array.length; i++) {
+            for (let j = 0; j < arrayLength; j++) {
+                newArray[j].push(array[i][j]);
+            }
+        }
+
+        return newArray;
     }
 
     sameRow(i, j) {
@@ -308,6 +425,411 @@ class Sudoku {
         return changes;
     }
 
+    lookForTwinsInBlocks() {
+        let changes = false;
+
+        //look for twins in each cell
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                //if two possible values, check for twins
+                if (this.actual[c][r] === 0 && this.possible[c][r].length === 2) {
+
+                    //scan by the block that the current cell is in
+                    let startC = c - (c % 3);
+                    let startR = r - (r % 3);
+
+                    for (let rr = startR; rr < startR + 3; rr++) {
+                        for (let cc = startC; cc < startC + 3; cc++) {
+
+                            //for cells other than the pair of twins
+                            if (!(cc === c && rr === r) && this.possible[cc][rr] === this.possible[c][r]) {
+
+                                //twins found, remove the twins from all the other possible values in the block
+                                for (let rrr = startR; rrr < startR + 3; rrr++) {
+                                    for (let ccc = startC; ccc < startC + 3; ccc++) {
+
+                                        //only check for empty cells
+                                        if (this.actual[ccc][rrr] === 0 && this.possible[ccc][rrr] !== this.possible[c][r]) {
+
+                                            //save a copy of the original possible value (twins)
+                                            let original_possible = this.possible[ccc][rrr];
+
+                                            //remove first twin number from possible values
+                                            this.possible[ccc][rrr] = this.possible[ccc][rrr].replace(this.possible[c][r][0], '');
+
+                                            //remove second twin number from possible values
+                                            this.possible[ccc][rrr] = this.possible[ccc][rrr].replace(this.possible[c][r][1], '');
+
+                                            //if the possible values are modified then set the change variable to true
+                                            if (original_possible !== this.possible[ccc][rrr]) {
+                                                console.log('lookForTwinsInBlocks possibles changed:', ccc, rrr);
+                                                changes = true;
+                                            }
+
+                                            //if possible values reduced to empty string, then user placed a wrong move
+                                            if (this.possible[ccc][rrr] === '')
+                                                throw 'Invalid Move';
+
+                                            //if left with 1 possible value for current cell, cell is confirmed
+                                            if (this.possible[ccc][rrr].length === 1) {
+                                                console.log('lookForTwinsInBlocks confirmed:', ccc, rrr);
+                                                this.actual[ccc][rrr] = parseInt(this.possible[ccc][rrr]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        return changes;
+    }
+
+    lookForTwinsInRows() {
+        let changes = false;
+
+        //for each row,check each column in the row
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+
+                //if two possible values, check for twins
+                if (this.actual[c][r] === 0 && this.possible[c][r].length === 2) {
+
+                    //scans columns in this row
+                    for (let cc = c + 1; cc < 9; cc++) {
+
+                        if (this.possible[cc][r] === this.possible[c][r]) {
+
+                            //twin found, remove the twins from all the other possible values in the column
+                            for (let ccc = 0; ccc < 9; ccc++) {
+
+                                //only check for empty cells
+                                if (this.actual[ccc][r] === 0 && ccc !== c && ccc !== cc) {
+
+                                    //save a copy of the original possible value (twins)
+                                    let original_possible = this.possible[ccc][r];
+
+                                    //remove first twin number from possible values
+                                    this.possible[ccc][r] = this.possible[ccc][r].replace(this.possible[c][r][0], '');
+
+                                    //remove second twin number from possible values
+                                    this.possible[ccc][r] = this.possible[ccc][r].replace(this.possible[c][r][1], '');
+
+                                    //if the possible values are modified then set the change variable to true
+                                    if (original_possible !== this.possible[ccc][r]) {
+                                        console.log('lookForTwinsInRows possibles changed:', ccc, r);
+                                        changes = true;
+                                    }
+
+                                    //if possible values reduced to empty string, then user placed a wrong move
+                                    if (this.possible[ccc][r] === '')
+                                        throw 'Invalid Move';
+
+                                    //if left with 1 possible value for current cell, cell is confirmed
+                                    if (this.possible[ccc][r].length === 1) {
+                                        console.log('lookForTwinsInRows confirmed:', ccc, r);
+                                        this.actual[ccc][r] = parseInt(this.possible[ccc][r]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return changes;
+    }
+
+    lookForTwinsInColumns() {
+        let changes = false;
+
+        //for each row,check each column in the column
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+
+                //if two possible values, check for twins
+                if (this.actual[c][r] === 0 && this.possible[c][r].length === 2) {
+
+                    //scans rows in this column
+                    for (let rr = r + 1; rr < 9; rr++) {
+
+                        if (this.possible[c][rr] === this.possible[c][r]) {
+
+                            //twin found, remove the twins from all the other possible values in the column
+                            for (let rrr = 0; rrr < 9; rrr++) {
+
+                                if (this.actual[c][rrr] === 0 && rrr !== r && rrr !== rr) {
+
+                                    //save a copy of the original possible value (twins)
+                                    let original_possible = this.possible[c][rrr];
+
+                                    //remove first twin number from possible values
+                                    this.possible[c][rrr] = this.possible[c][rrr].replace(this.possible[c][r][0], '');
+
+                                    //remove second twin number from possible values
+                                    this.possible[c][rrr] = this.possible[c][rrr].replace(this.possible[c][r][1], '');
+
+                                    //if the possible values are modified then set the change variable to true
+                                    if (original_possible !== this.possible[c][rrr]) {
+                                        console.log('lookForTwinsInColumns possibles changed:', c, rrr);
+                                        changes = true;
+                                    }
+
+                                    //if possible values reduced to empty string, then user placed a wrong move
+                                    if (this.possible[c][rrr] === '')
+                                        throw 'Invalid Move';
+
+                                    //if left with 1 possible value for current cell, cell is confirmed
+                                    if (this.possible[c][rrr].length === 1) {
+                                        console.log('lookForTwinsInColumns confirmed:', c, rrr);
+                                        this.actual[c][rrr] = parseInt(this.possible[c][rrr]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return changes;
+    }
+
+    lookForTripletsInBlocks() {
+        let changes = false;
+
+        //check each cell
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+
+                //three possible values; check for triplets
+                if (this.actual[c][r] === 0 && this.possible[c][r].length === 3) {
+
+                    //first potential triplet found
+                    let tripletslocation = `${c}${r}`;
+
+                    //scan by block
+                    let startC = c - (c % 3);
+                    let startR = r - (r % 3);
+
+                    for (let rr = startR; rr < startR + 3; rr++) {
+                        for (let cc = startC; cc < startC + 3; cc++) {
+                            if (!(cc === c && rr === r) &&
+                                ((this.possible[cc][rr] === this.possible[c][r]) ||
+                                    (this.possible[cc][rr].length === 2 &&
+                                        this.possible[c][r].indexOf(this.possible[cc][rr][0].toString()) > -1 &&
+                                        this.possible[c][r].indexOf(this.possible[cc][rr][1].toString()) > -1))) {
+
+                                //save the coordinates of the triplets
+                                tripletslocation += `${cc}${rr}`;
+                            }
+                        }
+                    }
+
+                    //found 3 cells as triplets; remove all from other cells
+                    if (tripletslocation.length === 6) {
+
+                        //triplets found, remove each cell's possible values containing rhe triplet
+                        for (let rrr = startR; rrr < startR + 3; rrr++) {
+                            for (let ccc = startC; ccc < startC + 3; ccc++) {
+
+                                //look for the cell that is not part of the 3 cells found
+                                if (this.actual[ccc][rrr] === 0 &&
+                                    ccc !== parseInt(tripletslocation[0].toString()) &&
+                                    rrr !== parseInt(tripletslocation[1].toString()) &&
+                                    ccc !== parseInt(tripletslocation[2].toString()) &&
+                                    rrr !== parseInt(tripletslocation[3].toString()) &&
+                                    ccc !== parseInt(tripletslocation[4].toString()) &&
+                                    rrr !== parseInt(tripletslocation[5].toString())) {
+
+                                    //save the original possible values
+                                    let original_possible = this.possible[ccc][rrr];
+
+                                    //remove first triplet number from possible values
+                                    this.possible[ccc][rrr] = this.possible[ccc][rrr].replace(this.possible[c][r][0], '');
+
+                                    //remove second triplet number from possible values
+                                    this.possible[ccc][rrr] = this.possible[ccc][rrr].replace(this.possible[c][r][1], '');
+
+                                    //remove third triplet number from possible values
+                                    this.possible[ccc][rrr] = this.possible[ccc][rrr].replace(this.possible[c][r][2], '');
+
+                                    //if the possible values are modified then set the change variable to true
+                                    if (original_possible !== this.possible[ccc][rrr]) {
+                                        console.log('lookForTripletsInBlocks possibles changed:', ccc, rrr);
+                                        changes = true;
+                                    }
+
+                                    //if possible values reduced to empty string, then user placed a wrong move
+                                    if (this.possible[ccc][rrr] === '')
+                                        throw 'Invalid Move';
+
+                                    //if left with 1 possible value for current cell, cell is confirmed
+                                    if (this.possible[ccc][rrr].length === 1) {
+                                        console.log('lookForTripletsInBlocks confirmed:', ccc, rrr);
+                                        this.actual[ccc][rrr] = parseInt(this.possible[ccc][rrr]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return changes;
+    }
+
+    lookForTripletsInRows() {
+        let changes = false;
+
+        //check each cell
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+
+                //three possible values; check for triplets
+                if (this.actual[c][r] === 0 && this.possible[c][r].length === 3) {
+
+                    //first potential triplet found
+                    let tripletslocation = `${c}${r}`;
+
+                    //scan columns in this row
+                    for (let cc = 0; cc < 9; cc++) {
+                        if ((cc !== c) &&
+                            ((this.possible[cc][r] === this.possible[c][r]) ||
+                                (this.possible[cc][r].length === 2 &&
+                                    this.possible[c][r].indexOf(this.possible[cc][r][0].toString()) > -1 &&
+                                    this.possible[c][r].indexOf(this.possible[cc][r][1].toString()) > -1))) {
+
+                            //save the coordinates of the triplets
+                            tripletslocation += `${cc}${r}`;
+                        }
+                    }
+
+                    //found 3 cells as triplets; remove all from other cells
+                    if (tripletslocation.length === 6) {
+
+                        //triplets found, remove each cell's possible values containing rhe triplet
+                        for (let ccc = 0; ccc < 9; ccc++) {
+
+                            //look for the cell that is not part of the 3 cells found
+                            if (this.actual[ccc][r] === 0 &&
+                                ccc !== parseInt(tripletslocation[0].toString()) &&
+                                ccc !== parseInt(tripletslocation[2].toString()) &&
+                                ccc !== parseInt(tripletslocation[4].toString())) {
+
+                                //save the original possible values
+                                let original_possible = this.possible[ccc][r];
+
+                                //remove first triplet number from possible values
+                                this.possible[ccc][r] = this.possible[ccc][r].replace(this.possible[c][r][0], '');
+
+                                //remove second triplet number from possible values
+                                this.possible[ccc][r] = this.possible[ccc][r].replace(this.possible[c][r][1], '');
+
+                                //remove third triplet number from possible values
+                                this.possible[ccc][r] = this.possible[ccc][r].replace(this.possible[c][r][2], '');
+
+                                //if the possible values are modified then set the change variable to true
+                                if (original_possible !== this.possible[ccc][r]) {
+                                    console.log('lookForTripletsInRows possibles changed:', ccc, r);
+                                    changes = true;
+                                }
+
+                                //if possible values reduced to empty string, then user placed a wrong move
+                                if (this.possible[ccc][r] === '')
+                                    throw 'Invalid Move';
+
+                                //if left with 1 possible value for current cell, cell is confirmed
+                                if (this.possible[ccc][r].length === 1) {
+                                    console.log('lookForTripletsInRows confirmed:', ccc, r);
+                                    this.actual[ccc][r] = parseInt(this.possible[ccc][r]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return changes;
+    }
+
+    lookForTripletsInColumns() {
+        let changes = false;
+
+        //check each cell
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+
+                //three possible values; check for triplets
+                if (this.actual[c][r] === 0 && this.possible[c][r].length === 3) {
+
+                    //first potential triplet found
+                    let tripletslocation = `${c}${r}`;
+
+                    //scan rows in this column
+                    for (let rr = 0; rr < 9; rr++) {
+                        if ((rr !== r) &&
+                            ((this.possible[c][rr] === this.possible[c][r]) ||
+                                (this.possible[c][rr].length === 2 &&
+                                    this.possible[c][r].indexOf(this.possible[c][rr][0].toString()) > -1 &&
+                                    this.possible[c][r].indexOf(this.possible[c][rr][1].toString()) > -1))) {
+
+                            //save the coordinates of the triplets
+                            tripletslocation += `${c}${rr}`;
+                        }
+                    }
+
+                    //found 3 cells as triplets; remove all from other cells
+                    if (tripletslocation.length === 6) {
+
+                        //triplets found, remove each cell's possible values containing rhe triplet
+                        for (let rrr = 0; rrr < 9; rrr++) {
+
+                            //look for the cell that is not part of the 3 cells found
+                            if (this.actual[c][rrr] === 0 &&
+                                rrr !== parseInt(tripletslocation[1].toString()) &&
+                                rrr !== parseInt(tripletslocation[3].toString()) &&
+                                rrr !== parseInt(tripletslocation[5].toString())) {
+
+                                //save the original possible values
+                                let original_possible = this.possible[c][rrr];
+
+                                //remove first triplet number from possible values
+                                this.possible[c][rrr] = this.possible[c][rrr].replace(this.possible[c][r][0], '');
+
+                                //remove second triplet number from possible values
+                                this.possible[c][rrr] = this.possible[c][rrr].replace(this.possible[c][r][1], '');
+
+                                //remove third triplet number from possible values
+                                this.possible[c][rrr] = this.possible[c][rrr].replace(this.possible[c][r][2], '');
+
+                                //if the possible values are modified then set the change variable to true
+                                if (original_possible !== this.possible[c][rrr]) {
+                                    console.log('lookForTripletsInColumns possibles changed:', c, rrr);
+                                    changes = true;
+                                }
+
+                                //if possible values reduced to empty string, then user placed a wrong move
+                                if (this.possible[c][rrr] === '')
+                                    throw 'Invalid Move';
+
+                                //if left with 1 possible value for current cell, cell is confirmed
+                                if (this.possible[c][rrr].length === 1) {
+                                    console.log('lookForTripletsInColumns confirmed:', c, rrr);
+                                    this.actual[c][rrr] = parseInt(this.possible[c][rrr]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return changes;
+    }
+
+
     lookForLoneRangersinColumns() {
         let changes = false;
         let occurrence;
@@ -336,12 +858,6 @@ class Sudoku {
             }
         }
         return changes;
-    }
-
-    cloneArray(srcArr, dstArr) {
-        for (let i = 0; i < srcArr.length; i++) {
-            dstArr[i] = srcArr[i]
-        }
     }
 
     isPuzzleSolved(m = 1) {
@@ -380,20 +896,19 @@ class Sudoku {
         }
     }
 
-    solveSudokuRecursivly(v) {
-        if (typeof this.solveSudokuRecursivly.iters == 'undefined')
-            this.solveSudokuRecursivly.iters = 1;
+    solveSudokuByBruteForce(v) {
+        if (typeof this.solveSudokuByBruteForce.iters === 'undefined')
+            this.solveSudokuByBruteForce.iters = 1;
         else {
-            if (this.solveSudokuRecursivly.iters > 99999) {
-                this.solveSudokuRecursivly.iters = undefined;
+            if (this.solveSudokuByBruteForce.iters > 99999) {
+                this.solveSudokuByBruteForce.iters = undefined;
                 throw "Max Iterations";
             }
-            this.solveSudokuRecursivly.iters++;
+            this.solveSudokuByBruteForce.iters++;
         }
         let i = v.indexOf(0);
         if (i === -1) {
             this._values = v;
-            this.solveSudokuRecursivly.iters = undefined;
             return;
         }
         let excludedNumbers = [];
@@ -407,17 +922,19 @@ class Sudoku {
         for (let m of '123456789') {
             if (excludedNumbers.indexOf(parseInt(m)) === -1) {
                 v = v.slice(0, i).concat(parseInt(m), v.slice(i + 1, v.length));
-                this.solveSudokuRecursivly(v);
+                this.solveSudokuByBruteForce(v);
             }
         }
     }
 }
 
 solve = () => {
+    console.clear();
     let start = performance.now();
     let solved = false
     solved = sudoku.solve();
     if (!solved && defaultValues.length > 0) {
+        console.log("Retrying with the default values...")
         let values = [];
         for (let i of defaultValues) {
             values.push(i);
@@ -686,6 +1203,99 @@ reset = () => {
     redoes = [];
 }
 
+loadString = s => {
+    let content = s.replace(/\s/g, "");
+    let values = [];
+    let isBold = true;
+    for (let i = 0; i < content.length; i++) {
+        if ('1234567890.*'.indexOf(content[i] > -1)) {
+            if (values.length === cells.length)
+                break;
+            switch (content[i]) {
+                case '0':
+                case '.':
+                    values.push(0);
+                    isBold = true;
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    if (isBold) {
+                        values.push(parseInt(content[i]));
+                    } else {
+                        values.push(parseInt(content[i]) * -1);
+                        isBold = true;
+                    }
+                    break;
+                case '*':
+                    isBold = false;
+                    break;
+                default:
+                    alert("The file format is incorrect.");
+                    return;
+            }
+        } else {
+            alert("The file format is incorrect.");
+            return;
+        }
+    }
+    for (let i = 0; i < values.length; i++) {
+        if (i === cells.length)
+            break;
+        sudoku.values[i] = Math.abs(values[i])
+        if (values[i] > 0) {
+            cells[i].style.fontWeight = "bold";
+            defaultValues[i] = sudoku.values[i];
+        } else {
+            cells[i].style.fontWeight = "normal";
+            defaultValues[i] = 0;
+        }
+        cells[i].style.backgroundColor = "white";
+        if (sudoku.values[i]) {
+            cells[i].innerText = sudoku.values[i];
+        } else {
+            cells[i].innerText = '';
+        }
+    }
+    if (values.length < cells.length) {
+        for (let i = values.length; i < cells.length; i++) {
+            cells[i].style.fontWeight = "normal";
+            sudoku.values[i] = 0;
+            defaultValues[i] = 0;
+            cells[i].innerText = '';
+        }
+    }
+    undoes = [];
+    redoes = [];
+    caption.innerText = 'Sudoku';
+}
+
+saveString = () => {
+    let str = "";
+    for (let i = 0; i < cells.length; i++) {
+        if (cells[i].innerText && cells[i].style.fontWeight === 'bold') {
+            str += cells[i].innerText;
+        } else {
+            if (cells[i].innerText) {
+                str += `*${cells[i].innerText}`;
+            } else {
+                str += "*0";
+            }
+        }
+        if (i < cells.length - 1 && (i + 1) % 9 === 0) {
+            str += `
+`;
+        }
+    }
+    return str;
+}
+
 readFile = e => {
     let file = e.files[0];
     if (!file) {
@@ -693,76 +1303,8 @@ readFile = e => {
     }
     let reader = new FileReader();
     reader.onload = e => {
-        let content = e.target.result.replace(/\s/g, "");
-        let values = [];
-        let isBold = true;
-        for (let i = 0; i < content.length; i++) {
-            if ('1234567890.*'.indexOf(content[i] > -1)) {
-                if (values.length === cells.length)
-                    break;
-                switch (content[i]) {
-                    case '0':
-                    case '.':
-                        values.push(0);
-                        isBold = true;
-                        break;
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                        if (isBold) {
-                            values.push(parseInt(content[i]));
-                        } else {
-                            values.push(parseInt(content[i]) * -1);
-                            isBold = true;
-                        }
-                        break;
-                    case '*':
-                        isBold = false;
-                        break;
-                    default:
-                        alert("The file format is incorrect.");
-                        return;
-                }
-            } else {
-                alert("The file format is incorrect.");
-                return;
-            }
-        }
-        for (let i = 0; i < values.length; i++) {
-            if (i === cells.length)
-                break;
-            sudoku.values[i] = Math.abs(values[i])
-            if (values[i] > 0) {
-                cells[i].style.fontWeight = "bold";
-                defaultValues[i] = sudoku.values[i];
-            } else {
-                cells[i].style.fontWeight = "normal";
-                defaultValues[i] = 0;
-            }
-            cells[i].style.backgroundColor = "white";
-            if (sudoku.values[i]) {
-                cells[i].innerText = sudoku.values[i];
-            } else {
-                cells[i].innerText = '';
-            }
-        }
-        if (values.length < cells.length) {
-            for (let i = values.length; i < cells.length; i++) {
-                cells[i].style.fontWeight = "normal";
-                sudoku.values[i] = 0;
-                defaultValues[i] = 0;
-                cells[i].innerText = '';
-            }
-        }
-        undoes = [];
-        redoes = [];
-        caption.innerText = 'Sudoku';
+        let content = e.target.result;
+        loadString(content);
     };
     reader.readAsText(file, 'utf-8');
 }
@@ -794,23 +1336,7 @@ savefile = (filename, data) => {
 }
 
 saveSudoku = () => {
-    let str = "";
-    for (let i = 0; i < cells.length; i++) {
-        if (cells[i].innerText && cells[i].style.fontWeight === 'bold') {
-            str += cells[i].innerText;
-        } else {
-            if (cells[i].innerText) {
-                str += `*${cells[i].innerText}`;
-            } else {
-                str += "*0";
-            }
-        }
-        if (i < cells.length - 1 && (i + 1) % 9 === 0) {
-            str += `
-`;
-        }
-    }
-    savefile('sudoku.txt', str);
+    savefile('sudoku.txt', saveString());
 }
 
 undo = () => {
@@ -833,6 +1359,181 @@ redo = () => {
     }
 }
 
+newSudoku = () => {
+    let puzzle = [];
+    let idx = [];
+    let str = saveString();
+    let arr = [];
+    let arr2 = new Array(cells.length);
+    let mtx = [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+    ];
+    let s = '';
+    let mtx2;
+    str = str.replace(/\*\d/g, '.').replace(/\s/g, '');
+    if (typeof firstPuzzle === 'undefined') {
+        for (let i = 0; i < puzzles.length; i++) {
+            s = puzzles[i];
+            s = s.split("").reverse().join("");
+            if (puzzles.indexOf(s) === -1) {
+                puzzles.push(s);
+            }
+            sudoku.string2Array(puzzles[i], arr);
+            sudoku.array2Matrix(arr, mtx);
+            mtx2 = sudoku.transposeArray(mtx, mtx.length);
+            sudoku.matrix2Array(mtx2, arr2);
+            s = sudoku.array2String(arr2);
+            if (puzzles.indexOf(s) === -1) {
+                puzzles.push(s);
+            }
+            mtx2 = [
+                mtx[6], mtx[7], mtx[8],
+                mtx[3], mtx[4], mtx[5],
+                mtx[0], mtx[1], mtx[2]
+            ];
+            sudoku.matrix2Array(mtx2, arr2);
+            s = sudoku.array2String(arr2);
+            if (puzzles.indexOf(s) === -1) {
+                puzzles.push(s);
+            }
+        }
+    }
+    firstPuzzle = false;
+    for (let i = 0; i < cells.length; i++) {
+        idx.push(i);
+        puzzle.push(0);
+    }
+    let rand
+    for (let i = 0; i < 6561; i++) {
+        emptyCount = puzzle.filter(x => x === 0).length;
+        rand = Math.random(0, 1);
+        if ((emptyCount < 65) && ((emptyCount <= 45) || (rand > 0.9))) {
+            break;
+        }
+        let j = Math.round((Math.random(0, 1) * (idx.length - 1)));
+        let vals = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        for (let k = 0; k < puzzle.length; k++) {
+            if (vals.length === 0) {
+                break;
+            }
+            if (sudoku.sameRow(idx[j], k) || sudoku.sameCol(idx[j], k) || sudoku.sameBlock(idx[j], k)) {
+                let l = vals.indexOf(k)
+                if (l > -1) {
+                    vals.splice(l, 1);
+                }
+            }
+        }
+        if (vals.length > 0) {
+            let val = 0;
+            for (let v of vals) {
+                if (puzzle.filter(x => x === v).length === 0) {
+                    val = v;
+                    break;
+                }
+            }
+            if (val > 0) {
+                puzzle[idx[j]] = val;
+            } else {
+                puzzle[idx[j]] = vals[Math.round(Math.random(0, 1) * (vals.length - 1))];
+            }
+            idx.splice(j, 1);
+
+            for (let i = 0; i < puzzle.length; i++) {
+                for (let j = 0; j < puzzle.length; j++) {
+                    if ((i !== j) && puzzle[i] > 0 && puzzle[j] > 0) {
+                        if (sudoku.sameRow(i, j) || sudoku.sameCol(i, j) || sudoku.sameBlock(i, j)) {
+                            if (puzzle[i] === puzzle[j]) {
+                                puzzle[i] = 0;
+                                if (idx.indexOf(i) === -1) {
+                                    let index = 0
+                                    for (k of idx) {
+                                        if (k < i) {
+                                            index++
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                    idx.splice(index, 0, i);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    let strPuzzle = '';
+    for (let i = 0; i < puzzle.length; i++) {
+        if (puzzle[i] > 0) {
+            strPuzzle += puzzle[i].toString();
+        } else {
+            strPuzzle += '.';
+        }
+    }
+    s = new Sudoku(puzzle.slice(0));
+
+    if (strPuzzle !== str && s.solve()) {
+        sudoku.values = puzzle;
+        if (puzzles.indexOf(strPuzzle) === -1) {
+            puzzles.push(strPuzzle);
+        }
+        s = strPuzzle;
+        s = s.split("").reverse().join("");
+        if (puzzles.indexOf(s) === -1) {
+            puzzles.push(s);
+        }
+        sudoku.string2Array(strPuzzle, arr);
+        sudoku.array2Matrix(arr, mtx);
+        mtx2 = sudoku.transposeArray(mtx, mtx.length);
+        sudoku.matrix2Array(mtx2, arr2);
+        s = sudoku.array2String(arr2);
+        if (puzzles.indexOf(s) === -1) {
+            puzzles.push(s);
+        }
+        mtx2 = [
+            mtx[6], mtx[7], mtx[8],
+            mtx[3], mtx[4], mtx[5],
+            mtx[0], mtx[1], mtx[2]
+        ];
+        sudoku.matrix2Array(mtx2, arr2);
+        s = sudoku.array2String(arr2);
+        if (puzzles.indexOf(s) === -1) {
+            puzzles.push(s);
+        }
+
+        for (let i = 0; i < cells.length; i++) {
+            if (puzzle[i] !== 0) {
+                cells[i].innerText = puzzle[i];
+                cells[i].style.fontWeight = 'bold';
+            } else {
+                cells[i].innerText = '';
+                cells[i].style.fontWeight = 'normal';
+            }
+            defaultValues[i] = puzzle[i];
+        }
+    } else {
+        let currentIndex = puzzles.indexOf(str);
+        let currentPuzzle = '';
+        if (currentIndex > -1) {
+            currentPuzzle = puzzles[currentIndex];
+            puzzles.splice(currentIndex, 1);
+        }
+        puzzle = puzzles[Math.round(Math.random(0, 1) * (puzzles.length - 1))];
+        loadString(puzzle);
+        if (currentPuzzle !== '') {
+            puzzles.push(currentPuzzle);
+        }
+    }
+}
+
 window.onload = () => {
     let table = document.getElementsByTagName("table")[0];
     let solveButton = document.getElementById('btnSolve');
@@ -842,6 +1543,7 @@ window.onload = () => {
     let saveButton = document.getElementById('btnSave');
     let undoButton = document.getElementById('btnUndo');
     let redoButton = document.getElementById('btnRedo');
+    let newButton = document.getElementById('btnNew');
     let tbodies = table.getElementsByTagName("tbody");
     caption = table.getElementsByTagName("caption")[0];
 
@@ -888,6 +1590,9 @@ window.onload = () => {
     }
     redoButton.onclick = () => {
         redo();
+    }
+    newButton.onclick = () => {
+        newSudoku();
     }
     for (let i = 0; i < cells.length; i++)
         cells[i].onclick = () => {
