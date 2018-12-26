@@ -395,7 +395,6 @@ class Sudoku {
                 }
                 if (occurrence === 1) {
                     //number is confirmed
-                    //console.log(cPos, rPos, n);
                     this.actual[cPos][rPos] = n;
                     changes = true;
                 }
