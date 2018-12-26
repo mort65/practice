@@ -1449,7 +1449,7 @@ function startGenerator() {
                 showLog('Puzzle generated:');
                 showLog(event.data);
                 puzzles.push(event.data);
-                genModifiedPuzzles();
+                //genModifiedPuzzles();
             }
         }
     }
