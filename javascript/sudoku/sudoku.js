@@ -1,11 +1,12 @@
+"use strict";
 let caption = null;
 let selectedIndex = null;
-let defaultValues = []
-let cells = []
-let values = []
+let defaultValues = [];
+let cells = [];
+let values = [];
 let sudoku = null;
-let undoes = []
-let redoes = []
+let undoes = [];
+let redoes = [];
 let puzzles = [
     "39..6.8.7.2..3..5......5.969..5.24.............39.7..281.6......3..5..8.5.2.9..43",
     "..8.5.49.4657....2.9.43.1656491..53...2.9......36......2...1.5.9...7..2.371..29..",
@@ -19,7 +20,16 @@ let puzzles = [
     "..6.....4...86.73..4.35...217.4..6...9.....8...8..6.172...81.4..67.43...8.....3..",
     "1...7..3.83.6.......29..6.86....49.7.9.....5.3.75....42.3..91.......2.43.4..8...9",
     "6......4...5..2..7729.....3.9..4...1....6....4...8..7.3.....1652..4..8...5......4",
+    "1.36.47.9.2..9..1.7.......62.4.3.9.8.........5..9.7..16...5...2....7....9..8.2..5"
 ];
+let verbose = false;
+let w;
+
+const showLog = l => {
+    if (verbose) {
+        console.log(l);
+    }
+}
 
 class Sudoku {
     constructor(values) {
@@ -58,11 +68,11 @@ class Sudoku {
                             if (this.values[i] && i !== j && this.values[i] === this.values[j]) {
                                 if (defaultValues.length > 0) {
                                     if (defaultValues[i] !== this.values[i]) {
-                                        console.log('Invalid Move');
+                                        showLog('Invalid Move');
                                         this.values[i] = 0;
                                     } else if (defaultValues[j] !== this.values[j]) {
                                         this.values[j] = 0;
-                                        console.log('Invalid Move');
+                                        showLog('Invalid Move');
                                     } else {
                                         return false;
                                     }
@@ -74,7 +84,7 @@ class Sudoku {
                     }
                 }
                 if (this.values.filter(x => x === 0).length > 64) {
-                    console.log("Insufficient Clues")
+                    showLog("Insufficient Clues")
                     return false;
                 }
                 let changes = false;
@@ -184,7 +194,7 @@ class Sudoku {
 
                 } catch (ex) {
                     if (ex === 'Invalid Move') {
-                        console.log("Puzzle not solved.")
+                        showLog("Puzzle not solved.")
                         this.array2Matrix(this._values, this.actual);
                     } else
                         throw ex;
@@ -193,11 +203,11 @@ class Sudoku {
                 this.matrix2Array(this.actual, this.values);
 
                 if (this.isPuzzleSolved()) {
-                    console.log("Puzzle solved.")
+                    showLog("Puzzle solved.")
                     return true;
                 }
 
-                console.log('Solvig by brute force...');
+                showLog('Solvig by brute force...');
 
                 this._values = [...this.values];
 
@@ -205,8 +215,8 @@ class Sudoku {
                     this.solveSudokuByBruteForce(this._values);
                 } catch (err) {
                     if (err === "Max Iterations") {
-                        console.log('Max Iterations Error')
-                        console.log("Puzzle not solved.")
+                        showLog('Max Iterations Error')
+                        showLog("Puzzle not solved.")
                         return false;
 
                     } else throw err;
@@ -215,14 +225,14 @@ class Sudoku {
                 this.values = [...this._values];
 
                 if (this.isPuzzleSolved(0)) {
-                    console.log("Puzzle solved.")
+                    showLog("Puzzle solved.")
                     return true;
                 }
-                console.log("Puzzle not solved.")
+                showLog("Puzzle not solved.")
                 return false;
             } else {
-                console.log("Insufficient Clues")
-                console.log("Can't solve the puzzle.")
+                showLog("Insufficient Clues")
+                showLog("Can't solve the puzzle.")
                 return false
             }
         };
@@ -416,7 +426,6 @@ class Sudoku {
                 }
                 if (occurrence === 1) {
                     //number is confirmed
-                    //console.log(cPos, rPos, n);
                     this.actual[cPos][rPos] = n;
                     changes = true;
                 }
@@ -462,7 +471,7 @@ class Sudoku {
 
                                             //if the possible values are modified then set the change variable to true
                                             if (original_possible !== this.possible[ccc][rrr]) {
-                                                console.log('lookForTwinsInBlocks possibles changed:', ccc, rrr);
+                                                showLog('lookForTwinsInBlocks possibles changed:', ccc, rrr);
                                                 changes = true;
                                             }
 
@@ -472,7 +481,7 @@ class Sudoku {
 
                                             //if left with 1 possible value for current cell, cell is confirmed
                                             if (this.possible[ccc][rrr].length === 1) {
-                                                console.log('lookForTwinsInBlocks confirmed:', ccc, rrr);
+                                                showLog('lookForTwinsInBlocks confirmed:', ccc, rrr);
                                                 this.actual[ccc][rrr] = parseInt(this.possible[ccc][rrr]);
                                             }
                                         }
@@ -520,7 +529,7 @@ class Sudoku {
 
                                     //if the possible values are modified then set the change variable to true
                                     if (original_possible !== this.possible[ccc][r]) {
-                                        console.log('lookForTwinsInRows possibles changed:', ccc, r);
+                                        showLog('lookForTwinsInRows possibles changed:', ccc, r);
                                         changes = true;
                                     }
 
@@ -530,7 +539,7 @@ class Sudoku {
 
                                     //if left with 1 possible value for current cell, cell is confirmed
                                     if (this.possible[ccc][r].length === 1) {
-                                        console.log('lookForTwinsInRows confirmed:', ccc, r);
+                                        showLog('lookForTwinsInRows confirmed:', ccc, r);
                                         this.actual[ccc][r] = parseInt(this.possible[ccc][r]);
                                     }
                                 }
@@ -574,7 +583,7 @@ class Sudoku {
 
                                     //if the possible values are modified then set the change variable to true
                                     if (original_possible !== this.possible[c][rrr]) {
-                                        console.log('lookForTwinsInColumns possibles changed:', c, rrr);
+                                        showLog('lookForTwinsInColumns possibles changed:', c, rrr);
                                         changes = true;
                                     }
 
@@ -584,7 +593,7 @@ class Sudoku {
 
                                     //if left with 1 possible value for current cell, cell is confirmed
                                     if (this.possible[c][rrr].length === 1) {
-                                        console.log('lookForTwinsInColumns confirmed:', c, rrr);
+                                        showLog('lookForTwinsInColumns confirmed:', c, rrr);
                                         this.actual[c][rrr] = parseInt(this.possible[c][rrr]);
                                     }
                                 }
@@ -658,7 +667,7 @@ class Sudoku {
 
                                     //if the possible values are modified then set the change variable to true
                                     if (original_possible !== this.possible[ccc][rrr]) {
-                                        console.log('lookForTripletsInBlocks possibles changed:', ccc, rrr);
+                                        showLog('lookForTripletsInBlocks possibles changed:', ccc, rrr);
                                         changes = true;
                                     }
 
@@ -668,7 +677,7 @@ class Sudoku {
 
                                     //if left with 1 possible value for current cell, cell is confirmed
                                     if (this.possible[ccc][rrr].length === 1) {
-                                        console.log('lookForTripletsInBlocks confirmed:', ccc, rrr);
+                                        showLog('lookForTripletsInBlocks confirmed:', ccc, rrr);
                                         this.actual[ccc][rrr] = parseInt(this.possible[ccc][rrr]);
                                     }
                                 }
@@ -733,7 +742,7 @@ class Sudoku {
 
                                 //if the possible values are modified then set the change variable to true
                                 if (original_possible !== this.possible[ccc][r]) {
-                                    console.log('lookForTripletsInRows possibles changed:', ccc, r);
+                                    showLog('lookForTripletsInRows possibles changed:', ccc, r);
                                     changes = true;
                                 }
 
@@ -743,7 +752,7 @@ class Sudoku {
 
                                 //if left with 1 possible value for current cell, cell is confirmed
                                 if (this.possible[ccc][r].length === 1) {
-                                    console.log('lookForTripletsInRows confirmed:', ccc, r);
+                                    showLog('lookForTripletsInRows confirmed:', ccc, r);
                                     this.actual[ccc][r] = parseInt(this.possible[ccc][r]);
                                 }
                             }
@@ -807,7 +816,7 @@ class Sudoku {
 
                                 //if the possible values are modified then set the change variable to true
                                 if (original_possible !== this.possible[c][rrr]) {
-                                    console.log('lookForTripletsInColumns possibles changed:', c, rrr);
+                                    showLog('lookForTripletsInColumns possibles changed:', c, rrr);
                                     changes = true;
                                 }
 
@@ -817,7 +826,7 @@ class Sudoku {
 
                                 //if left with 1 possible value for current cell, cell is confirmed
                                 if (this.possible[c][rrr].length === 1) {
-                                    console.log('lookForTripletsInColumns confirmed:', c, rrr);
+                                    showLog('lookForTripletsInColumns confirmed:', c, rrr);
                                     this.actual[c][rrr] = parseInt(this.possible[c][rrr]);
                                 }
                             }
@@ -851,7 +860,6 @@ class Sudoku {
                 }
                 if (occurrence === 1) {
                     //number is confirmed
-                    //console.log(cPos, rPos, n);
                     this.actual[cPos][rPos] = n;
                     changes = true;
                 }
@@ -928,13 +936,15 @@ class Sudoku {
     }
 }
 
-solve = () => {
-    console.clear();
+const solve = () => {
+    if (verbose) {
+        console.clear();
+    }
     let start = performance.now();
     let solved = false
     solved = sudoku.solve();
     if (!solved && defaultValues.length > 0) {
-        console.log("Retrying with the default values...")
+        showLog("Retrying with the default values...")
         let values = [];
         for (let i of defaultValues) {
             values.push(i);
@@ -957,52 +967,65 @@ solve = () => {
     undoes = [];
     redoes = [];
     selectedIndex = null;
-    if (solved)
-        caption.innerText = `Solved in ${end - start} ms.`;
+    let duration = (end - start).toFixed(0);
+    if (solved) {
+        caption.innerText = `Solved in ${duration} ms.`;
+    }
 }
 
-select = index => {
-    if (selectedIndex === index) {
-        cells[selectedIndex].style.backgroundColor = "white";
-        selectedIndex = null;
-        return;
-    }
-    if (cells[index].innerText) {
-        let conflict = false;
-        for (let i = 0; i < cells.length; i++) {
-            if (i !== index) {
-                if (sudoku.sameRow(i, index) || sudoku.sameCol(i, index) || sudoku.sameBlock(i, index)) {
-                    if (cells[i].innerText === cells[index].innerText) {
-                        cells[index].style.backgroundColor = "red";
-                        conflict = true;
-                        break;
+const select = index => {
+    if (selectedIndex !== index) {
+        if (cells[index].innerText) {
+            let conflict = false;
+            for (let i = 0; i < cells.length; i++) {
+                if (i !== index) {
+                    if (sudoku.sameRow(i, index) || sudoku.sameCol(i, index) || sudoku.sameBlock(i, index)) {
+                        if (cells[i].innerText === cells[index].innerText) {
+                            cells[index].style.backgroundColor = "red";
+                            conflict = true;
+                            break;
+                        }
                     }
                 }
             }
-        }
-        if (!conflict) {
+            if (!conflict) {
+                cells[index].style.backgroundColor = "green";
+            }
+        } else {
             cells[index].style.backgroundColor = "green";
         }
-    } else {
-        cells[index].style.backgroundColor = "green";
+        if (selectedIndex !== null) {
+            cells[selectedIndex].style.backgroundColor = "white";
+        }
+        selectedIndex = index;
     }
-    if (selectedIndex !== null) {
-        cells[selectedIndex].style.backgroundColor = "white";
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        if (index !== null && (cells[index].style.fontWeight === 'normal' || isCleared())) {
+            let num = prompt("Please enter an integer between 0 and 9", cells[selectedIndex].innerText);
+            if (num !== null) {
+                num = num.replace(/\s/g, "");
+                if (num === '') {
+                    num = '0';
+                }
+                if ('0123456789'.indexOf(num) > -1) {
+                    update(parseInt(num) + 48, selectedIndex);
+                }
+            }
+        }
     }
-    selectedIndex = index;
 }
 
-normalize = n => {
+const normalize = n => {
     return n > 9 ? "" + n : "0" + n;
 }
 
-recordChange = (index, oldValue, newValue) => {
+const recordChange = (index, oldValue, newValue) => {
     if (newValue !== oldValue) {
         undoes.push(`${normalize(index)}${normalize(oldValue)}${normalize(newValue)}`);
     }
 }
 
-isCleared = () => {
+const isCleared = () => {
     for (let i = 0; i < cells.length; i++) {
         if (cells[i].style.fontWeight === "normal") {
             return false;
@@ -1010,7 +1033,7 @@ isCleared = () => {
     }
     return true;
 }
-update = (keyCode, index, record = true) => {
+const update = (keyCode, index, record = true) => {
     if (index === null || (cells[index].style.fontWeight === 'bold' && !isCleared())) {
         return;
     }
@@ -1163,7 +1186,7 @@ update = (keyCode, index, record = true) => {
     }
 }
 
-clear = () => {
+const clear = () => {
     for (let i = 0; i < cells.length; i++) {
         sudoku.values[i] = 0;
         cells[i].innerText = '';
@@ -1179,7 +1202,7 @@ clear = () => {
     redoes = [];
 }
 
-reset = () => {
+const reset = () => {
     if (defaultValues.length > 0) {
         for (let i = 0; i < defaultValues.length; i++) {
             if (defaultValues[i]) {
@@ -1203,7 +1226,7 @@ reset = () => {
     redoes = [];
 }
 
-loadString = s => {
+const loadString = s => {
     let content = s.replace(/\s/g, "");
     let values = [];
     let isBold = true;
@@ -1276,7 +1299,7 @@ loadString = s => {
     caption.innerText = 'Sudoku';
 }
 
-saveString = () => {
+const saveString = () => {
     let str = "";
     for (let i = 0; i < cells.length; i++) {
         if (cells[i].innerText && cells[i].style.fontWeight === 'bold') {
@@ -1296,7 +1319,7 @@ saveString = () => {
     return str;
 }
 
-readFile = e => {
+const readFile = e => {
     let file = e.files[0];
     if (!file) {
         return;
@@ -1309,7 +1332,7 @@ readFile = e => {
     reader.readAsText(file, 'utf-8');
 }
 
-loadSudoku = () => {
+const loadSudoku = () => {
     let input = document.createElement('input');
     input.type = 'file';
     input.click();
@@ -1318,7 +1341,7 @@ loadSudoku = () => {
     }
 }
 
-savefile = (filename, data) => {
+const savefile = (filename, data) => {
     let blob = new Blob([data], {
         type: 'text/csv'
     });
@@ -1335,11 +1358,11 @@ savefile = (filename, data) => {
     }
 }
 
-saveSudoku = () => {
+const saveSudoku = () => {
     savefile('sudoku.txt', saveString());
 }
 
-undo = () => {
+const undo = () => {
     if (undoes.length > 0) {
         let change = undoes[undoes.length - 1];
         let index = parseInt(change.slice(0, 2));
@@ -1347,9 +1370,15 @@ undo = () => {
         redoes.push(undoes.pop());
         update(48 + oldValue, index, false);
     }
+    for (let i = 0; i < cells.length; i++) {
+        if (cells[i].style.backgroundColor !== "white") {
+            cells[i].style.backgroundColor = "white";
+        }
+        selectedIndex = null;
+    }
 }
 
-redo = () => {
+const redo = () => {
     if (redoes.length > 0) {
         let change = redoes[redoes.length - 1];
         let index = parseInt(change.slice(0, 2));
@@ -1357,14 +1386,16 @@ redo = () => {
         undoes.push(redoes.pop());
         update(48 + oldValue, index, false);
     }
+    for (let i = 0; i < cells.length; i++) {
+        if (cells[i].style.backgroundColor !== "white") {
+            cells[i].style.backgroundColor = "white";
+        }
+        selectedIndex = null;
+    }
 }
 
-newSudoku = () => {
-    let puzzle = [];
-    let idx = [];
-    let str = saveString();
-    let arr = [];
-    let arr2 = new Array(cells.length);
+const genModifiedPuzzles = () => {
+    //create new puzzles by modifying existing puzzles
     let mtx = [
         [],
         [],
@@ -1376,123 +1407,18 @@ newSudoku = () => {
         [],
         []
     ];
+    let arr = [];
     let s = '';
-    let mtx2;
-    str = str.replace(/\*\d/g, '.').replace(/\s/g, '');
-    if (typeof firstPuzzle === 'undefined') {
-        for (let i = 0; i < puzzles.length; i++) {
-            s = puzzles[i];
-            s = s.split("").reverse().join("");
-            if (puzzles.indexOf(s) === -1) {
-                puzzles.push(s);
-            }
-            sudoku.string2Array(puzzles[i], arr);
-            sudoku.array2Matrix(arr, mtx);
-            mtx2 = sudoku.transposeArray(mtx, mtx.length);
-            sudoku.matrix2Array(mtx2, arr2);
-            s = sudoku.array2String(arr2);
-            if (puzzles.indexOf(s) === -1) {
-                puzzles.push(s);
-            }
-            mtx2 = [
-                mtx[6], mtx[7], mtx[8],
-                mtx[3], mtx[4], mtx[5],
-                mtx[0], mtx[1], mtx[2]
-            ];
-            sudoku.matrix2Array(mtx2, arr2);
-            s = sudoku.array2String(arr2);
-            if (puzzles.indexOf(s) === -1) {
-                puzzles.push(s);
-            }
-        }
-    }
-    firstPuzzle = false;
-    for (let i = 0; i < cells.length; i++) {
-        idx.push(i);
-        puzzle.push(0);
-    }
-    let rand
-    for (let i = 0; i < 6561; i++) {
-        emptyCount = puzzle.filter(x => x === 0).length;
-        rand = Math.random(0, 1);
-        if ((emptyCount < 65) && ((emptyCount <= 45) || (rand > 0.9))) {
-            break;
-        }
-        let j = Math.round((Math.random(0, 1) * (idx.length - 1)));
-        let vals = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        for (let k = 0; k < puzzle.length; k++) {
-            if (vals.length === 0) {
-                break;
-            }
-            if (sudoku.sameRow(idx[j], k) || sudoku.sameCol(idx[j], k) || sudoku.sameBlock(idx[j], k)) {
-                let l = vals.indexOf(k)
-                if (l > -1) {
-                    vals.splice(l, 1);
-                }
-            }
-        }
-        if (vals.length > 0) {
-            let val = 0;
-            for (let v of vals) {
-                if (puzzle.filter(x => x === v).length === 0) {
-                    val = v;
-                    break;
-                }
-            }
-            if (val > 0) {
-                puzzle[idx[j]] = val;
-            } else {
-                puzzle[idx[j]] = vals[Math.round(Math.random(0, 1) * (vals.length - 1))];
-            }
-            idx.splice(j, 1);
-
-            for (let i = 0; i < puzzle.length; i++) {
-                for (let j = 0; j < puzzle.length; j++) {
-                    if ((i !== j) && puzzle[i] > 0 && puzzle[j] > 0) {
-                        if (sudoku.sameRow(i, j) || sudoku.sameCol(i, j) || sudoku.sameBlock(i, j)) {
-                            if (puzzle[i] === puzzle[j]) {
-                                puzzle[i] = 0;
-                                if (idx.indexOf(i) === -1) {
-                                    let index = 0
-                                    for (k of idx) {
-                                        if (k < i) {
-                                            index++
-                                            continue;
-                                        }
-                                        break;
-                                    }
-                                    idx.splice(index, 0, i);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    let strPuzzle = '';
-    for (let i = 0; i < puzzle.length; i++) {
-        if (puzzle[i] > 0) {
-            strPuzzle += puzzle[i].toString();
-        } else {
-            strPuzzle += '.';
-        }
-    }
-    s = new Sudoku(puzzle.slice(0));
-
-    if (strPuzzle !== str && s.solve()) {
-        sudoku.values = puzzle;
-        if (puzzles.indexOf(strPuzzle) === -1) {
-            puzzles.push(strPuzzle);
-        }
-        s = strPuzzle;
+    let arr2 = new Array(cells.length);
+    for (let i = 0; i < puzzles.length; i++) {
+        s = puzzles[i];
         s = s.split("").reverse().join("");
         if (puzzles.indexOf(s) === -1) {
             puzzles.push(s);
         }
-        sudoku.string2Array(strPuzzle, arr);
+        sudoku.string2Array(puzzles[i], arr);
         sudoku.array2Matrix(arr, mtx);
-        mtx2 = sudoku.transposeArray(mtx, mtx.length);
+        let mtx2 = sudoku.transposeArray(mtx, mtx.length);
         sudoku.matrix2Array(mtx2, arr2);
         s = sudoku.array2String(arr2);
         if (puzzles.indexOf(s) === -1) {
@@ -1508,30 +1434,50 @@ newSudoku = () => {
         if (puzzles.indexOf(s) === -1) {
             puzzles.push(s);
         }
+    }
+}
 
-        for (let i = 0; i < cells.length; i++) {
-            if (puzzle[i] !== 0) {
-                cells[i].innerText = puzzle[i];
-                cells[i].style.fontWeight = 'bold';
-            } else {
-                cells[i].innerText = '';
-                cells[i].style.fontWeight = 'normal';
+function startGenerator() {
+    genModifiedPuzzles();
+    if (typeof (Worker) !== "undefined") {
+        if (typeof (w) === "undefined") {
+            w = new Worker("gensudoku.js");
+            showLog('sudoku generator started.');
+        }
+        w.onmessage = function (event) {
+            if (event.data !== '' && puzzles.indexOf(event.data) === -1) {
+                showLog('Puzzle generated:');
+                showLog(event.data);
+                puzzles.push(event.data);
+                genModifiedPuzzles();
             }
-            defaultValues[i] = puzzle[i];
-        }
-    } else {
-        let currentIndex = puzzles.indexOf(str);
-        let currentPuzzle = '';
-        if (currentIndex > -1) {
-            currentPuzzle = puzzles[currentIndex];
-            puzzles.splice(currentIndex, 1);
-        }
-        puzzle = puzzles[Math.round(Math.random(0, 1) * (puzzles.length - 1))];
-        loadString(puzzle);
-        if (currentPuzzle !== '') {
-            puzzles.push(currentPuzzle);
         }
     }
+}
+
+function stopGenerator() {
+    w.terminate();
+    w = undefined;
+    showLog('sudoku generator stopped.');
+}
+
+const newSudoku = () => {
+    stopGenerator();
+    let puzzle = [];
+    let str = saveString();
+    str = str.replace(/\*\d/g, '.').replace(/\s/g, '');
+    let currentIndex = puzzles.indexOf(str);
+    let currentPuzzle = '';
+    if (currentIndex > -1) {
+        currentPuzzle = puzzles[currentIndex];
+        puzzles.splice(currentIndex, 1);
+    }
+    puzzle = puzzles[Math.round(Math.random(0, 1) * (puzzles.length - 1))];
+    loadString(puzzle);
+    if (currentPuzzle !== '') {
+        puzzles.push(currentPuzzle);
+    }
+    startGenerator()
 }
 
 window.onload = () => {
@@ -1547,22 +1493,26 @@ window.onload = () => {
     let tbodies = table.getElementsByTagName("tbody");
     caption = table.getElementsByTagName("caption")[0];
 
-
+    let vals = puzzles[Math.round((Math.random(0, 1) * (puzzles.length - 1)))];
+    let index = 0;
     for (let tbody of tbodies) {
         let trs = tbody.getElementsByTagName("tr");
         for (let tr of trs) {
             let tds = tr.getElementsByTagName("td");
-            for (td of tds) {
-                if (td.innerText) {
+            for (let td of tds) {
+                if ('123456789'.indexOf(vals[index]) > -1) {
+                    td.innerText = vals[index];
+                    td.style.fontWeight = "bold";
                     values.push(parseInt(td.innerText));
                     defaultValues.push(parseInt(td.innerText));
-                    td.style.fontWeight = "bold";
                 } else {
+                    td.innerText = '';
+                    td.style.fontWeight = "normal";
                     values.push(0);
                     defaultValues.push(0);
-                    td.style.fontWeight = "normal";
                 }
                 cells.push(td);
+                index++;
             }
         }
     }
@@ -1606,4 +1556,6 @@ window.onload = () => {
             update(event.keyCode, selectedIndex);
         }
     });
+    caption.innerText = "Sudoku";
+    startGenerator();
 }
